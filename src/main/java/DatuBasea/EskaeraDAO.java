@@ -17,7 +17,7 @@ public class EskaeraDAO {
 
     public List<Eskaera> kargatuEskaerak() {
         List<Eskaera> eskaerak = new ArrayList<>();
-        String sql = "SELECT e.id, m.zenbakia AS mahaia_zenb, e.sortze_data " +
+        String sql = "SELECT e.id, m.zenbakia AS mahaia_zenb, e.sortze_data, e.sukaldea_egoera " +
                      "FROM eskaerak e " +
                      "LEFT JOIN mahaiak m ON e.mahaia_id = m.id " +
                      "ORDER BY e.sortze_data DESC LIMIT 50";
@@ -30,8 +30,9 @@ public class EskaeraDAO {
                 Integer mahaiaZenb = rs.getObject("mahaia_zenb") != null ? rs.getInt("mahaia_zenb") : null;
                 Timestamp ts = rs.getTimestamp("sortze_data");
                 LocalDateTime sortzeData = ts != null ? ts.toLocalDateTime() : null;
+                String sukaldeaEgoera = rs.getString("sukaldea_egoera");
                 List<EskaeraItem> items = kargatuEskaerarenProduktua(id);
-                eskaerak.add(new Eskaera(id, mahaiaZenb, sortzeData, items));
+                eskaerak.add(new Eskaera(id, mahaiaZenb, sortzeData, items, sukaldeaEgoera));
             }
         } catch (SQLException e) {
             System.err.println("Errorea eskaerak kargatzean: " + e.getMessage());
@@ -85,6 +86,18 @@ public class EskaeraDAO {
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Errorea eskaera ezabatzean: " + e.getMessage());
+        }
+    }
+
+    public void eguneratuSukaldeaEgoera(int eskaeraId, String sukaldeaEgoera) {
+        String sql = "UPDATE eskaerak SET sukaldea_egoera = ? WHERE id = ?";
+        try (Connection c = Conn.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, sukaldeaEgoera);
+            ps.setInt(2, eskaeraId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Errorea sukaldea_egoera eguneratzean: " + e.getMessage());
         }
     }
 

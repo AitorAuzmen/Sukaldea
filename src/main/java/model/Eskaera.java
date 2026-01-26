@@ -8,12 +8,14 @@ public class Eskaera {
     private final Integer mahaiaZenbakia;
     private final LocalDateTime sortzeData;
     private final List<EskaeraItem> items;
+    private final String sukaldeaEgoera;
 
-    public Eskaera(int id, Integer mahaiaZenbakia, LocalDateTime sortzeData, List<EskaeraItem> items) {
+    public Eskaera(int id, Integer mahaiaZenbakia, LocalDateTime sortzeData, List<EskaeraItem> items, String sukaldeaEgoera) {
         this.id = id;
         this.mahaiaZenbakia = mahaiaZenbakia;
         this.sortzeData = sortzeData;
         this.items = items;
+        this.sukaldeaEgoera = sukaldeaEgoera;
     }
 
     public int getId() {
@@ -30,5 +32,9 @@ public class Eskaera {
 
     public List<EskaeraItem> getItems() {
         return items;
+    }
+
+    public String getSukaldeaEgoera() {
+        return sukaldeaEgoera;
     }
 }

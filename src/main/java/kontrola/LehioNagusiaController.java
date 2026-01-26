@@ -83,7 +83,7 @@ public class LehioNagusiaController {
             "-fx-effect: dropshadow(gaussian, rgba(63,122,224,0.3), 8,0,0,2);" +
             "-fx-padding: 10;";
     private int azkenEskaeraId = 0;
-        private final Map<Integer, String> eskaeraEgoerak = new HashMap<>();
+    private final Map<Integer, String> eskaeraEgoerak = new HashMap<>();
 
     @FXML
     private void initialize() {
@@ -189,7 +189,7 @@ public class LehioNagusiaController {
         produktuakScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         produktuakScroll.setStyle("-fx-background-color: transparent;");
 
-        String egoera = eskaeraEgoerak.getOrDefault(eskaera.getId(), "Zain");
+        String egoera = eskaeraEgoerak.getOrDefault(eskaera.getId(), mapSukaldeaEgoeraUI(eskaera.getSukaldeaEgoera()));
         Label egoeraLbl = new Label("Egoera: " + egoera);
         eguneratuEgoeraEstiloa(egoeraLbl, egoera);
 
@@ -253,6 +253,10 @@ public class LehioNagusiaController {
         hautatuEskaeraId = null;
         komandaGrid.getChildren().clear();
         for (Eskaera eskaera : eskaerak) {
+            String uiEgoera = mapSukaldeaEgoeraUI(eskaera.getSukaldeaEgoera());
+            if (uiEgoera != null) {
+                eskaeraEgoerak.put(eskaera.getId(), uiEgoera);
+            }
             komandaGrid.getChildren().add(sortuKomandaKarta(eskaera));
         }
     }
@@ -267,11 +271,39 @@ public class LehioNagusiaController {
     }
 
     private void eguneratuEgoeraSukaldea(int eskaeraId, String egoera, Label egoeraLbl) {
+        String dbEgoera = mapSukaldeaEgoeraDB(egoera);
+        if (dbEgoera != null) {
+            eskaeraDAO.eguneratuSukaldeaEgoera(eskaeraId, dbEgoera);
+        }
         eskaeraEgoerak.put(eskaeraId, egoera);
         if (egoeraLbl != null) {
             egoeraLbl.setText("Egoera: " + egoera);
             eguneratuEgoeraEstiloa(egoeraLbl, egoera);
         }
+    }
+
+    private String mapSukaldeaEgoeraUI(String dbEgoera) {
+        if (dbEgoera == null) {
+            return "Zain";
+        }
+        return switch (dbEgoera) {
+            case "zain" -> "Zain";
+            case "hasi" -> "Prestatzen";
+            case "prest" -> "Prest";
+            default -> "Zain";
+        };
+    }
+
+    private String mapSukaldeaEgoeraDB(String uiEgoera) {
+        if (uiEgoera == null) {
+            return null;
+        }
+        return switch (uiEgoera) {
+            case "Zain" -> "zain";
+            case "Prestatzen" -> "hasi";
+            case "Prest" -> "prest";
+            default -> null;
+        };
     }
 
 

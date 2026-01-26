@@ -124,6 +124,7 @@ CREATE TABLE `eskaerak` (
   `erabiltzaile_id` int NOT NULL,
   `komensalak` tinyint DEFAULT NULL,
   `egoera` enum('irekita','itxita','ordainketa_pendiente') DEFAULT 'irekita',
+  `sukaldea_egoera` enum('zain','hasi','prest') DEFAULT 'zain',
   `sortze_data` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `itxiera_data` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -140,7 +141,7 @@ CREATE TABLE `eskaerak` (
 
 LOCK TABLES `eskaerak` WRITE;
 /*!40000 ALTER TABLE `eskaerak` DISABLE KEYS */;
-INSERT INTO `eskaerak` VALUES (2,1,2,4,'irekita','2025-12-18 16:49:45',NULL),(3,1,2,4,'irekita','2025-12-18 16:54:48',NULL);
+INSERT INTO `eskaerak` VALUES (2,1,2,4,'irekita',NULL,'2025-12-18 16:49:45',NULL),(3,1,2,4,'irekita',NULL,'2025-12-18 16:54:48',NULL);
 /*!40000 ALTER TABLE `eskaerak` ENABLE KEYS */;
 UNLOCK TABLES;
 
