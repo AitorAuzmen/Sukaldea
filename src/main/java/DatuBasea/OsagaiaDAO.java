@@ -115,4 +115,16 @@ public class OsagaiaDAO {
             e.printStackTrace();
         }
     }
+    // Stock-a eguneratu osagai batean
+    public void eguneratuOsagaiaStocka(int osagaiaId, double berria) {
+        String query = "UPDATE osagaiak SET stock_aktuala = ? WHERE id = ?";
+        try (Connection conn = Conn.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setDouble(1, berria);
+            stmt.setInt(2, osagaiaId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

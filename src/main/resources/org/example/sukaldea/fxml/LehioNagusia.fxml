@@ -18,6 +18,7 @@
                     <children>
                         <Label text="JAUS - Leiho Nagusia" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;"/>
                         <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="erabiltzaileLabel" text="" style="-fx-text-fill: #f1c40f; -fx-font-size: 15; -fx-font-weight: bold;"/>
                         <Label fx:id="orduLabel" text="--:--:--" style="-fx-text-fill: white; -fx-font-size: 16;"/>
                     </children>
                 </HBox>

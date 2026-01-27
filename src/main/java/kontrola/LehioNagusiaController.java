@@ -45,6 +45,11 @@ import model.Eskaera;
 import model.EskaeraItem;
 
 public class LehioNagusiaController {
+    // Campo para guardar el nombre del usuario logueado
+    public static String erabiltzaileIzena = "";
+
+    @FXML
+    private Label erabiltzaileLabel;
 
     private ProduktuaDAO produktuaDAO = new ProduktuaDAO();
     private KategoriaDAO kategoriaDAO = new KategoriaDAO();
@@ -87,6 +92,10 @@ public class LehioNagusiaController {
 
     @FXML
     private void initialize() {
+                // Si hay usuario logueado, mostrarlo
+                if (erabiltzaileLabel != null && erabiltzaileIzena != null && !erabiltzaileIzena.isEmpty()) {
+                    erabiltzaileLabel.setText("Saioa hasi du: " + erabiltzaileIzena);
+                }
         // Eskaerak kargatu (DB)
         kargatuEskaerak();
         azkenEskaeraId = eskaeraDAO.lortuAzkenEskaeraId();
@@ -440,7 +449,56 @@ public class LehioNagusiaController {
     private void aldatuStocka(Produktua produktua, int cambio) {
         int nuevoStock = produktua.getStocka() + cambio;
         if (nuevoStock < 0) nuevoStock = 0;
-        
+
+        // Si se quiere subir el stock (cambio > 0)
+        if (cambio > 0) {
+            ObservableList<ProduktuOsagaia> osagaiak = osagaiaDAO.kargatuProduktuarenOsagaiak(produktua.getId());
+            if (osagaiak.isEmpty()) {
+                erakutsiNotifikazioa("Ezin da stocka igo: produktuak ez du osagairik");
+                return;
+            }
+            // Comprobar stock de cada osagaia
+            for (ProduktuOsagaia po : osagaiak) {
+                Osagaia osagaia = null;
+                for (Osagaia o : osagaiaDAO.kargatuOsagaiak()) {
+                    if (o.getId() == po.getOsagaiaId()) {
+                        osagaia = o;
+                        break;
+                    }
+                }
+                if (osagaia == null) {
+                    erakutsiNotifikazioa("Osagai hau ez da existitzen: " + po.getOsagaiaIzena());
+                    return;
+                }
+                double beharrezkoKant = po.getKantitatea() * cambio;
+                if (osagaia.getStockAktuala() < beharrezkoKant) {
+                    erakutsiNotifikazioa("Ez dago nahikoa '" + po.getOsagaiaIzena() + "' stocka");
+                    return;
+                }
+            }
+            // Si hay suficiente stock, restar a los osagaiak
+            for (ProduktuOsagaia po : osagaiak) {
+                Osagaia osagaia = null;
+                for (Osagaia o : osagaiaDAO.kargatuOsagaiak()) {
+                    if (o.getId() == po.getOsagaiaId()) {
+                        osagaia = o;
+                        break;
+                    }
+                }
+                if (osagaia != null) {
+                    double berria = osagaia.getStockAktuala() - po.getKantitatea() * cambio;
+                    osagaia.setStockAktuala(berria);
+                    // Actualizar en la base de datos
+                    osagaiaDAO.eguneratuOsagaiaStocka(osagaia.getId(), berria);
+                }
+            }
+        } else if (cambio < 0) {
+            // Si se quiere bajar el stock, no hace falta comprobar osagaiak
+            if (produktua.getStocka() + cambio < 0) {
+                erakutsiNotifikazioa("Ezin da stocka jaitsi gehiago");
+                return;
+            }
+        }
         produktuaDAO.eguneratuStocka(produktua.getId(), nuevoStock);
         kargatuProduktuak();
     }
@@ -523,18 +581,19 @@ public class LehioNagusiaController {
                 String prezioStr = prezioField.getText().trim();
                 int stock = stockSp.getValue();
                 if (izena.isEmpty() || kat == null || prezioStr.isEmpty()) {
-                    System.err.println("Izena, kategoria eta prezioa beharrezkoak dira");
+                    erakutsiNotifikazioa("Izena, kategoria eta prezioa derrigorrezkoak dira");
                     return;
                 }
                 double prezioa;
                 try {
                     prezioa = Double.parseDouble(prezioStr.replace(",", "."));
                 } catch (NumberFormatException ex) {
-                    System.err.println("Prezioa zenbaki balioduna izan behar da");
+                    erakutsiNotifikazioa("Prezioa zenbaki balioduna izan behar da");
                     return;
                 }
                 gehituProduktua(izena, kat, prezioa, stock);
                 kargatuProduktuak();
+                erakutsiNotifikazioa("Produktua ondo gehitu da");
                 dialog.close();
             });
 
@@ -763,5 +822,7 @@ public class LehioNagusiaController {
         }
     }
 }
+
+
 
 

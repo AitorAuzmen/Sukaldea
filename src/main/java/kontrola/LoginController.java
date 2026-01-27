@@ -35,7 +35,7 @@ public class LoginController {
             alertaErakutsi("Saioa ondo hasi da", "Ongi etorri, " + erabiltzailea + "!", Alert.AlertType.INFORMATION);
             leihoNagusiaIreki();
         } else {
-            alertaErakutsi("Errorea", "Erabiltzailea edo pasahitza okerra", Alert.AlertType.ERROR);
+            alertaErakutsi("Errorea", "Erabiltzailea, pasahitza edo baimena (rol sukalde) okerra", Alert.AlertType.ERROR);
         }
     }
 
@@ -49,6 +49,9 @@ public class LoginController {
 
     private void leihoNagusiaIreki() {
         try {
+            // Guardar el nombre del usuario logueado en el controlador principal
+            LehioNagusiaController.erabiltzaileIzena = txtErabiltzailea.getText().trim();
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/sukaldea/fxml/LehioNagusia.fxml"));
             Parent root = loader.load();
 

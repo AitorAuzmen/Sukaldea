@@ -4,6 +4,7 @@ module Sukaldea {
     requires transitive javafx.graphics;
     requires transitive javafx.base;
     requires transitive java.sql;
+    requires mysql.connector.j;
 
     exports Main;
     exports Util;

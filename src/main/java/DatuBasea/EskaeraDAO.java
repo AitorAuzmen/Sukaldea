@@ -79,11 +79,39 @@ public class EskaeraDAO {
     }
 
     public void ezabatuEskaera(int eskaeraId) {
-        String sql = "DELETE FROM eskaerak WHERE id = ?";
-        try (Connection c = Conn.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, eskaeraId);
-            ps.executeUpdate();
+        String selectMahaiaSql = "SELECT mahaia_id FROM eskaerak WHERE id = ?";
+        String updateMahaiaSql = "UPDATE mahaiak SET egoera = 'libre' WHERE id = ?";
+        String deleteEskaeraSql = "DELETE FROM eskaerak WHERE id = ?";
+
+        try (Connection c = Conn.getConnection()) {
+            c.setAutoCommit(false);
+
+            Integer mahaiaId = null;
+            try (PreparedStatement ps = c.prepareStatement(selectMahaiaSql)) {
+                ps.setInt(1, eskaeraId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int id = rs.getInt("mahaia_id");
+                        if (!rs.wasNull()) {
+                            mahaiaId = id;
+                        }
+                    }
+                }
+            }
+
+            if (mahaiaId != null) {
+                try (PreparedStatement ps = c.prepareStatement(updateMahaiaSql)) {
+                    ps.setInt(1, mahaiaId);
+                    ps.executeUpdate();
+                }
+            }
+
+            try (PreparedStatement ps = c.prepareStatement(deleteEskaeraSql)) {
+                ps.setInt(1, eskaeraId);
+                ps.executeUpdate();
+            }
+
+            c.commit();
         } catch (SQLException e) {
             System.err.println("Errorea eskaera ezabatzean: " + e.getMessage());
         }
