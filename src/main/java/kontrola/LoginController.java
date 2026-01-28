@@ -49,7 +49,7 @@ public class LoginController {
 
     private void leihoNagusiaIreki() {
         try {
-            // Guardar el nombre del usuario logueado en el controlador principal
+            // Saioa hasi duen erabiltzailearen izena kontrolatzaile nagusian gorde
             LehioNagusiaController.erabiltzaileIzena = txtErabiltzailea.getText().trim();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/sukaldea/fxml/LehioNagusia.fxml"));

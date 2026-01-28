@@ -45,7 +45,7 @@ import model.Eskaera;
 import model.EskaeraItem;
 
 public class LehioNagusiaController {
-    // Campo para guardar el nombre del usuario logueado
+    // Saioa hasi duen erabiltzailearen izena gordetzeko eremua
     public static String erabiltzaileIzena = "";
 
     @FXML
@@ -122,105 +122,21 @@ public class LehioNagusiaController {
         kargatuProduktuak();
     }
 
-    private VBox sortuKomandaKarta(int numeroa, int mahaia) {
-        VBox card = new VBox();
-        card.setAlignment(Pos.TOP_LEFT);
-        card.setSpacing(8);
-        card.setPrefSize(360, 180);
-        card.setStyle(estiloTxartela(12));
-
-        Label izenburua = new Label("Komanda #" + numeroa);
-        izenburua.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #3F7AE0;");
-
-        Label mahaiaLbl = new Label("Mahaia: " + mahaia);
-        mahaiaLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #666666;");
-
-        // Demo produktu zerrenda
-        Label p1 = new Label("• Tortilla patatak x2");
-        Label p2 = new Label("• Entsalada mistoa x1");
-        Label p3 = new Label("• Hanburgesa x3");
-        Label p4 = new Label("• Txuleta x1");
-        p1.setStyle("-fx-font-size: 12;");
-        p2.setStyle("-fx-font-size: 12;");
-        p3.setStyle("-fx-font-size: 12;");
-        p4.setStyle("-fx-font-size: 12;");
-
-        card.getChildren().addAll(izenburua, mahaiaLbl, p1, p2, p3, p4);
-        return card;
-    }
-
+    // Refactor: Usar KomandaTxartelaFabrika para crear tarjetas de pedidos
     private VBox sortuKomandaKarta(Eskaera eskaera) {
-        VBox card = new VBox();
-        card.setAlignment(Pos.TOP_LEFT);
-        card.setSpacing(8);
-        card.setPrefWidth(360);
-        card.setMinHeight(Region.USE_PREF_SIZE);
-        card.setStyle(estiloTxartela(12));
-
-        Label izenburua = new Label("Eskaera #" + eskaera.getId());
-        izenburua.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #3F7AE0;");
-
-        String mahaiaText = eskaera.getMahaiaZenbakia() != null ? eskaera.getMahaiaZenbakia().toString() : "—";
-        Label mahaiaLbl = new Label("Mahaia: " + mahaiaText);
-        mahaiaLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-
-        String orduaText = "--:--";
-        LocalDateTime sortze = eskaera.getSortzeData();
-        if (sortze != null) {
-            orduaText = sortze.format(ESKAERA_FMT);
-        }
-        Label orduaLbl = new Label("Ordua: " + orduaText);
-        orduaLbl.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-
-        Label produktuakLbl = new Label("Produktuak:");
-        produktuakLbl.setStyle("-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
-
-        VBox produktuakBox = new VBox(2);
-        if (eskaera.getItems() == null || eskaera.getItems().isEmpty()) {
-            Label empty = new Label("• (produktuik gabe)");
-            empty.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-            produktuakBox.getChildren().add(empty);
-        } else {
-            List<EskaeraItem> items = eskaera.getItems();
-            for (int i = items.size() - 1; i >= 0; i--) {
-                EskaeraItem item = items.get(i);
-                Label p = new Label("• " + item.getIzena() + " x" + item.getKantitatea());
-                p.setStyle("-fx-font-size: 12; -fx-text-fill: #2c3e50;");
-                produktuakBox.getChildren().add(p);
+        return KomandaTxartelaFabrika.sortu(eskaera, eskaeraEgoerak, new KomandaTxartelaFabrika.KomandaTxartelaListener() {
+            @Override
+            public void onEgoeraAldatu(int eskaeraId, String egoera, Label egoeraLbl) {
+                eguneratuEgoeraSukaldea(eskaeraId, egoera, egoeraLbl);
+                if ("Prest".equals(egoera)) {
+                    erakutsiNotifikazioa("Eskaera #" + eskaeraId + " prest");
+                }
             }
-        }
-
-        ScrollPane produktuakScroll = new ScrollPane(produktuakBox);
-        produktuakScroll.setFitToWidth(true);
-        produktuakScroll.setPrefViewportHeight(120);
-        produktuakScroll.setMaxHeight(120);
-        produktuakScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        produktuakScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        produktuakScroll.setStyle("-fx-background-color: transparent;");
-
-        String egoera = eskaeraEgoerak.getOrDefault(eskaera.getId(), mapSukaldeaEgoeraUI(eskaera.getSukaldeaEgoera()));
-        Label egoeraLbl = new Label("Egoera: " + egoera);
-        eguneratuEgoeraEstiloa(egoeraLbl, egoera);
-
-
-        Button hasiBtn = new Button("Hasi");
-        hasiBtn.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 4 12;");
-        hasiBtn.setOnAction(e -> eguneratuEgoeraSukaldea(eskaera.getId(), "Prestatzen", egoeraLbl));
-
-        Button prestBtn = new Button("Prest");
-        prestBtn.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 4 12;");
-        prestBtn.setOnAction(e -> {
-            eguneratuEgoeraSukaldea(eskaera.getId(), "Prest", egoeraLbl);
-            erakutsiNotifikazioa("Eskaera #" + eskaera.getId() + " prest");
+            @Override
+            public void onHautatu(int eskaeraId, VBox card) {
+                hautatuEskaera(eskaeraId, card);
+            }
         });
-
-        HBox ekintzak = new HBox(8, hasiBtn, prestBtn);
-        ekintzak.setAlignment(Pos.CENTER_LEFT);
-
-        card.setOnMouseClicked(e -> hautatuEskaera(eskaera.getId(), card));
-
-        card.getChildren().addAll(izenburua, mahaiaLbl, orduaLbl, produktuakLbl, produktuakScroll, egoeraLbl, ekintzak);
-        return card;
     }
 
     private void hautatuEskaera(int eskaeraId, VBox card) {
@@ -229,11 +145,18 @@ public class LehioNagusiaController {
         }
         for (var child : komandaGrid.getChildren()) {
             if (child instanceof VBox) {
-                ((VBox) child).setStyle(estiloTxartela(12));
+                VBox vbox = (VBox) child;
+                vbox.getStyleClass().remove("txartela-hautatua");
+                if (!vbox.getStyleClass().contains("txartela")) {
+                    vbox.getStyleClass().add("txartela");
+                }
             }
         }
         hautatuEskaeraId = eskaeraId;
-        card.setStyle(ESTILO_TARJETA_SELECCIONADA);
+        card.getStyleClass().remove("txartela");
+        if (!card.getStyleClass().contains("txartela-hautatua")) {
+            card.getStyleClass().add("txartela-hautatua");
+        }
     }
 
     @FXML
@@ -317,13 +240,14 @@ public class LehioNagusiaController {
 
 
     private void eguneratuEgoeraEstiloa(Label egoeraLbl, String egoera) {
-        String kolorea = "#7f8c8d";
+        egoeraLbl.getStyleClass().removeAll("egoera-label", "egoera-label-prestatzen", "egoera-label-prest");
         if ("Prestatzen".equals(egoera)) {
-            kolorea = "#f39c12";
+            egoeraLbl.getStyleClass().add("egoera-label-prestatzen");
         } else if ("Prest".equals(egoera)) {
-            kolorea = "#27ae60";
+            egoeraLbl.getStyleClass().add("egoera-label-prest");
+        } else {
+            egoeraLbl.getStyleClass().add("egoera-label");
         }
-        egoeraLbl.setStyle("-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: " + kolorea + ";");
     }
 
     private void erakutsiNotifikazioa(String mezua) {
@@ -332,7 +256,7 @@ public class LehioNagusiaController {
         }
         Popup popup = new Popup();
         Label label = new Label(mezua);
-        label.setStyle("-fx-background-color: #3F7AE0; -fx-text-fill: white; -fx-padding: 8 12; -fx-background-radius: 6; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8,0,0,2);");
+        label.getStyleClass().add("notifikazio-label");
         label.setMinWidth(Region.USE_PREF_SIZE);
         popup.getContent().add(label);
 
@@ -383,67 +307,22 @@ public class LehioNagusiaController {
         kargatuProduktuak();
     }
 
+    // Refactor: Usar ProduktuaBotoiaFabrika para crear botones de producto
     private VBox sortuBotoiTPV(Produktua produktua) {
-        VBox vBox = new VBox();
-        vBox.setPrefSize(220, 200);
-        vBox.setSpacing(8);
-        vBox.setAlignment(Pos.TOP_CENTER);
-        vBox.setStyle(estiloTxartela(12));
-
-        // Produktuaren izena
-        Label nombre = new Label(produktua.getIzena());
-        nombre.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #2c3e50; -fx-text-alignment: center; -fx-wrap-text: true;");
-        nombre.setMaxWidth(195);
-
-        // Kategoria
-        Label kategoria = new Label(produktua.getKategoriaIzena());
-        kategoria.setStyle("-fx-font-size: 11; -fx-text-fill: #7f8c8d;");
-
-        // Prezioa
-        Label prezioa = new Label(String.format("%.2f€", produktua.getPrezioa()));
-        prezioa.setStyle("-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #3F7AE0;");
-
-        // Stocka
-        Label stockLabel = new Label("Stock: " + produktua.getStocka());
-        stockLabel.setStyle("-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-text-alignment: center;");
-        stockLabel.setPrefWidth(100);
-
-        // +/- botoiak horizontalki
-        HBox botoiak = new HBox(10);
-        botoiak.setAlignment(Pos.CENTER);
-        
-        Button kenduBtn = new Button("−");
-        kenduBtn.setPrefSize(50, 35);
-        kenduBtn.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-background-radius: 5;");
-        kenduBtn.setOnAction(e -> {
-            e.consume();
-            aldatuStocka(produktua, -1);
-        });
-
-        Button gehituBtn = new Button("+");
-        gehituBtn.setPrefSize(50, 35);
-        gehituBtn.setStyle("-fx-font-size: 18; -fx-font-weight: bold; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-background-radius: 5;");
-        gehituBtn.setOnAction(e -> {
-            e.consume();
-            aldatuStocka(produktua, 1);
-        });
-
-        botoiak.getChildren().addAll(kenduBtn, gehituBtn);
-
-        vBox.getChildren().addAll(nombre, kategoria, prezioa, stockLabel, botoiak);
-
-        // Click simple = seleccionar, Doble click = editar
-        vBox.setOnMouseClicked(e -> {
-            if (e.getClickCount() == 2) {
-                // Doble click = editar
-                irekiEdizioModalTPV(produktua);
-            } else if (e.getClickCount() == 1) {
-                // Click simple = seleccionar
-                hautatuProduktua(produktua, vBox);
+        return ProduktuaBotoiaFabrika.sortu(produktua, new ProduktuaBotoiaFabrika.ProduktuaBotoiaListener() {
+            @Override
+            public void onProduktuaHautatu(Produktua p, VBox vBox) {
+                hautatuProduktua(p, vBox);
+            }
+            @Override
+            public void onProduktuaEditatu(Produktua p) {
+                irekiEdizioModalTPV(p);
+            }
+            @Override
+            public void onStockAldatu(Produktua p, int aldaketa) {
+                aldatuStocka(p, aldaketa);
             }
         });
-
-        return vBox;
     }
 
     private void aldatuStocka(Produktua produktua, int cambio) {

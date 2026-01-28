@@ -18,9 +18,10 @@ public class EskaeraDAO {
     public List<Eskaera> kargatuEskaerak() {
         List<Eskaera> eskaerak = new ArrayList<>();
         String sql = "SELECT e.id, m.zenbakia AS mahaia_zenb, e.sortze_data, e.sukaldea_egoera " +
-                     "FROM eskaerak e " +
-                     "LEFT JOIN mahaiak m ON e.mahaia_id = m.id " +
-                     "ORDER BY e.sortze_data DESC LIMIT 50";
+                 "FROM eskaerak e " +
+                 "LEFT JOIN mahaiak m ON e.mahaia_id = m.id " +
+                 "WHERE e.egoera <> 'itxita' " +
+                 "ORDER BY e.sortze_data DESC LIMIT 50";
 
         try (Connection c = Conn.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);

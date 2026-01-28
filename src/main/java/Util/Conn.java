@@ -14,9 +14,9 @@ public class Conn {
     static {
         try {
             Class.forName(DRIVER);
-            System.out.println("Driver MySQL cargado correctamente");
+            System.out.println("MySQL driver-a ondo kargatu da");
         } catch (ClassNotFoundException e) {
-            System.err.println("Error cargando driver MySQL: " + e.getMessage());
+            System.err.println("Errorea MySQL driver-a kargatzean: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -25,22 +25,22 @@ public class Conn {
         try {
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
             if (conn != null) {
-                System.out.println("Conexión a la BD establecida correctamente");
+                System.out.println("Datu-basearekin konexioa ondo ezarri da");
             }
             return conn;
         } catch (SQLException e) {
-            System.err.println("Error en la conexión a la BD: " + e.getMessage());
-            throw new SQLException("No se pudo conectar a la base de datos: " + e.getMessage(), e);
+            System.err.println("Errorea datu-basearekin konexioan: " + e.getMessage());
+            throw new SQLException("Ezin izan da datu-basearekin konektatu: " + e.getMessage(), e);
         }
     }
 
     public static void testConnection() {
         try (Connection conn = getConnection()) {
             if (conn != null && !conn.isClosed()) {
-                System.out.println("Prueba de conexión: EXITOSA");
+                System.out.println("Konexio proba: ARRAKASTATSUA");
             }
         } catch (SQLException e) {
-            System.err.println("Prueba de conexión: FALLIDA - " + e.getMessage());
+            System.err.println("Konexio proba: HUTS - " + e.getMessage());
         }
     }
 }
