@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.Scene?>
+<?import javafx.scene.Parent?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+<?scenebuilder-stylesheet src="/org/example/sukaldea/css/estilos.css"?>
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -84,7 +91,7 @@
                             <center>
                                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="ALWAYS" style="-fx-background-color: #f5f5f5;">
                                     <content>
-                                        <FlowPane fx:id="produktuaGrid" hgap="15" vgap="15" prefWrapLength="1000" alignment="TOP_LEFT" style="-fx-background-color: #f5f5f5; -fx-padding: 20 40 20 40;">
+                                        <FlowPane fx:id="produktuaGrid" hgap="15" vgap="15" prefWrapLength="1000" alignment="CENTER" style="-fx-background-color: #f5f5f5; -fx-padding: 20 40 20 40;">
                                             <!-- Se llena desde el controlador con botones -->
                                         </FlowPane>
                                     </content>

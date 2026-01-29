@@ -134,6 +134,13 @@
 /* Fondo general */
 .root {
     -fx-background-color: #F4F4F4;
+    -fx-font-family: 'Inter';
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('Inter-Regular.ttf');
+}
 }
 
 /* 🔹 Barra lateral izquierda */
